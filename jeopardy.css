@@ -11,3 +11,8 @@ th {
 	text-transform: uppercase;
 	padding: 2px;
 }
+td {
+	text-align: center;
+	height: 80px;
+	border: 1px solid rgb(55, 55, 55);
+}

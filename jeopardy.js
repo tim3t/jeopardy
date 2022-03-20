@@ -75,8 +75,12 @@ async function fillTable() {
 	$board.append($('<tbody>'));
 	$('#board tbody').empty();
 	for (let clueI = 0; clueI < 5; clueI++) {
-		$('#board tbody').append($('<tr>'));
-		$('#board tbody tr').append($('<td>').text('?'));
+		let $tr = $('<tr>');
+		// $('#board tbody').append($('<tr>'));
+		for (let catI = 0; catI < 6; catI++) {
+			$tr.append($('<td>').attr('id', `${catI}-${clueI}`).text('?'));
+		}
+		$('#board tbody').append($tr);
 	}
 }
 
@@ -88,7 +92,28 @@ async function fillTable() {
  * - if currently "answer", ignore click
  * */
 
-function handleClick(evt) {}
+function handleClick(evt) {
+	let id = evt.target.id;
+	let [
+		catI,
+		clueI
+	] = id.split('-');
+	let clue = categories[catI].clues[clueI];
+
+	let display;
+	if (!clue.showing) {
+		display = clue.question;
+		clue.showing = 'question';
+	}
+	else if (clue.showing === 'question') {
+		display = clue.answer;
+		clue.showing = 'answer';
+	}
+	else {
+		return;
+	}
+	$(`#${catI}-${clueI}`).html(display);
+}
 
 /** Wipe the current Jeopardy board, show the loading spinner,
  * and update the button used to fetch data.
@@ -118,8 +143,10 @@ async function setupAndStart() {
 
 /** On click of start / restart button, set up game. */
 
-// TODO
+$('#restart').on('click', setupAndStart);
 
 /** On page load, add event handler for clicking clues */
-
-// TODO
+$(async function() {
+	setupAndStart();
+	$('#board').on('click', 'td', handleClick);
+});
