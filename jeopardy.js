@@ -1,5 +1,6 @@
 // Jeopardy Game Board exercise
 let categories = [];
+let $board = $('#board');
 
 // ↓↓↓ Returns an array of 75 category IDs under the variable name 'categories'
 // Shuffle callback, return array with 6 IDs
@@ -61,10 +62,8 @@ async function getCategory(catId) {
  */
 
 async function fillTable() {
-	let $board = $('#board');
+	$('#board thead').remove();
 	$board.append($('<thead>'));
-
-	$('#board thead').empty();
 	let $tr = $('<tr>');
 
 	for (let catI = 0; catI < 6; catI++) {
@@ -72,8 +71,8 @@ async function fillTable() {
 	}
 	$('#board thead').append($tr);
 
+	$('#board tbody').remove();
 	$board.append($('<tbody>'));
-	$('#board tbody').empty();
 	for (let clueI = 0; clueI < 5; clueI++) {
 		let $tr = $('<tr>');
 		// $('#board tbody').append($('<tr>'));
@@ -101,7 +100,7 @@ function handleClick(evt) {
 	let clue = categories[catI].clues[clueI];
 
 	let display;
-	if (!clue.showing) {
+	if (clue.showing === null) {
 		display = clue.question;
 		clue.showing = 'question';
 	}
@@ -119,11 +118,20 @@ function handleClick(evt) {
  * and update the button used to fetch data.
  */
 
-function showLoadingView() {}
+function showLoadingView() {
+	$('body').append(
+		'<div id=loading> <img src="http://www.clker.com/cliparts/5/a/e/d/15162091201946727476jeopardy-game-clipart.hi.png" alt="Loading"></div>'
+	);
+	$('#board').on('load', hideLoadingView());
+}
 
 /** Remove the loading spinner and update the button used to fetch data. */
 
-function hideLoadingView() {}
+function hideLoadingView() {
+	$('#loading').fadeOut(1500, function() {
+		$('#loading').remove();
+	});
+}
 
 /** Start game:
  *
@@ -133,6 +141,7 @@ function hideLoadingView() {}
  * */
 
 async function setupAndStart() {
+	showLoadingView();
 	let catIds = await getCategoryIds();
 	categories = [];
 	for (let catId of catIds) {
